@@ -1,5 +1,59 @@
-on: [push, pull_request, workflow_dispatch]
+name: Build ZMK Firmware
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-venv ninja-build cmake git wget unzip
+          python3 -m pip install --upgrade pip
+          pip install --user west
+
+      - name: Initialize ZMK workspace
+        run: |
+          west init -l config
+          west update
+          west zephyr-export
+
+      - name: Build left half
+        run: |
+          west build -s zmk/app -d build/left \
+            -b nice_nano_v2 -- \
+            -DZMK_CONFIG=./config \
+            -DZMK_EXTRA_MODULES=./config \
+            -DSHIELD=charybdis_left
+
+      - name: Build right half
+        run: |
+          west build -s zmk/app -d build/right \
+            -b nice_nano_v2 -- \
+            -DZMK_CONFIG=./config \
+            -DZMK_EXTRA_MODULES=./config \
+            -DSHIELD=charybdis_right
+
+      - name: Build settings reset
+        run: |
+          west build -s zmk/app -d build/settings_reset \
+            -b nice_nano_v2 -- \
+            -DZMK_CONFIG=./config \
+            -DZMK_EXTRA_MODULES=./config \
+            -DSHIELD=settings_reset
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: zmk-uf2
+          path: |
+            build/left/zephyr/zmk.uf2
+            build/right/zephyr/zmk.uf2
+            build/settings_reset/zephyr/zmk.uf2

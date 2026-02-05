@@ -1,8 +1,11 @@
 ---
 include:
-  - board: nrf52840_mdk
+  - board: nice_nano_v2
     shield: charybdis_left
-  - board: nrf52840_mdk
+    extra_modules: ./config
+  - board: nice_nano_v2
     shield: charybdis_right
-  - board: nrf52840_mdk
+    extra_modules: ./config
+  - board: nice_nano_v2
     shield: settings_reset
+    extra_modules: ./config

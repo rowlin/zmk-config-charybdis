@@ -30,7 +30,6 @@ jobs:
           west build -s zmk/app -d build/left \
             -b nice_nano_v2 -- \
             -DZMK_CONFIG=./config \
-            -DZMK_EXTRA_MODULES=./zephyr \
             -DSHIELD=charybdis_left
 
       - name: Build right half
@@ -38,7 +37,6 @@ jobs:
           west build -s zmk/app -d build/right \
             -b nice_nano_v2 -- \
             -DZMK_CONFIG=./config \
-            -DZMK_EXTRA_MODULES=./zephyr \
             -DSHIELD=charybdis_right
 
       - name: Build settings reset
@@ -46,7 +44,6 @@ jobs:
           west build -s zmk/app -d build/settings_reset \
             -b nice_nano_v2 -- \
             -DZMK_CONFIG=./config \
-            -DZMK_EXTRA_MODULES=./zephyr \
             -DSHIELD=settings_reset
 
       - name: Upload artifacts
